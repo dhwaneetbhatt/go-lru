@@ -8,11 +8,9 @@ import (
 
 func TestLRU(t *testing.T) {
 	lru := New(5)
-	require.Equal(t, 0, lru.freq["key1"])
 	require.Equal(t, 0, lru.Size())
 	lru.Put("key1", "val1")
 	require.Equal(t, "val1", lru.Get("key1"))
-	require.Equal(t, 1, lru.freq["key1"])
 	require.Equal(t, 1, lru.Size())
 
 	lru.Put("key2", "val2")

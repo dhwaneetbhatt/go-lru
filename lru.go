@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 type LRUCache struct {
 	store   map[string]string
 	maxSize int
@@ -25,7 +27,7 @@ func (c *LRUCache) Get(key string) string {
 
 func (c *LRUCache) Put(key string, value string) {
 	if c.Size() >= c.maxSize {
-		var min int = 1000000000000
+		var min int = math.MaxInt64
 		var toBeEvicted string
 		for k, v := range c.freq {
 			if v < min {
