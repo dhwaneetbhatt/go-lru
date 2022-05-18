@@ -2,33 +2,34 @@ package main
 
 import "math"
 
-type LRUCache struct {
-	store   map[string]string
+type LRUCache[K comparable, V any] struct {
+	store   map[K]V
 	maxSize int
-	freq    map[string]int
+	freq    map[K]int
 }
 
-func New(maxSize int) *LRUCache {
-	return &LRUCache{store: make(map[string]string), maxSize: maxSize, freq: make(map[string]int)}
+func New[K comparable, V any](maxSize int) *LRUCache[K, V] {
+	return &LRUCache[K, V]{store: make(map[K]V), maxSize: maxSize, freq: make(map[K]int)}
 }
 
-func (c *LRUCache) Size() int {
+func (c *LRUCache[K, V]) Size() int {
 	return len(c.store)
 }
 
-func (c *LRUCache) Get(key string) string {
+func (c *LRUCache[K, V]) Get(key K) V {
 	value, ok := c.store[key]
 	if ok {
 		c.freq[key]++
 		return value
 	}
-	return ""
+	var noop V
+	return noop
 }
 
-func (c *LRUCache) Put(key string, value string) {
+func (c *LRUCache[K, V]) Put(key K, value V) {
 	if c.Size() >= c.maxSize {
 		var min int = math.MaxInt64
-		var toBeEvicted string
+		var toBeEvicted K
 		for k, v := range c.freq {
 			if v < min {
 				min = v

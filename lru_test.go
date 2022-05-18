@@ -7,7 +7,7 @@ import (
 )
 
 func TestLRU(t *testing.T) {
-	lru := New(5)
+	lru := New[string, string](5)
 	require.Equal(t, 0, lru.Size())
 	lru.Put("key1", "val1")
 	require.Equal(t, "val1", lru.Get("key1"))
