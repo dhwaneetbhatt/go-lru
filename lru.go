@@ -1,15 +1,14 @@
 package main
 
-import "math"
-
 type LRUCache[K comparable, V any] struct {
-	store   map[K]V
-	maxSize int
-	freq    map[K]int
+	capacity int
+	store    map[K]*Node[K, V]
+	list     *DoublyLinkedList[K, V]
 }
 
-func New[K comparable, V any](maxSize int) *LRUCache[K, V] {
-	return &LRUCache[K, V]{store: make(map[K]V), maxSize: maxSize, freq: make(map[K]int)}
+func New[K comparable, V any](capacity int) *LRUCache[K, V] {
+	list := newDoublyLinkedList[K, V]()
+	return &LRUCache[K, V]{capacity: capacity, store: make(map[K]*Node[K, V]), list: list}
 }
 
 func (c *LRUCache[K, V]) Size() int {
@@ -17,28 +16,30 @@ func (c *LRUCache[K, V]) Size() int {
 }
 
 func (c *LRUCache[K, V]) Get(key K) V {
-	value, ok := c.store[key]
-	if ok {
-		c.freq[key]++
-		return value
+	node, ok := c.store[key]
+	if !ok {
+		var noop V
+		return noop
 	}
-	var noop V
-	return noop
+	c.list.remove(node)
+	c.list.add(node)
+	return node.value
 }
 
 func (c *LRUCache[K, V]) Put(key K, value V) {
-	if c.Size() >= c.maxSize {
-		var min int = math.MaxInt64
-		var toBeEvicted K
-		for k, v := range c.freq {
-			if v < min {
-				min = v
-				toBeEvicted = k
-			}
-		}
-		delete(c.store, toBeEvicted)
-		delete(c.freq, toBeEvicted)
+	_, ok := c.store[key]
+	if ok {
+		delete(c.store, key)
 	}
-	c.store[key] = value
-	c.freq[key] = 0
+
+	if c.Size() == c.capacity {
+		delete(c.store, c.list.tail.prev.key)
+		c.list.remove(c.list.tail.prev)
+	}
+
+	n := new(Node[K, V])
+	n.key = key
+	n.value = value
+	c.list.add(n)
+	c.store[key] = n
 }

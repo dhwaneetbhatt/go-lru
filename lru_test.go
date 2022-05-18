@@ -26,5 +26,5 @@ func TestLRU(t *testing.T) {
 	require.Equal(t, 5, lru.Size())
 
 	require.Equal(t, "val6", lru.Get("key6"))
-	require.Equal(t, "", lru.Get("key5"))
+	require.Equal(t, "", lru.Get("key1"))
 }
